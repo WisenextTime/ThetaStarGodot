@@ -110,6 +110,6 @@ public partial class Scene : Control
 			if(node == _endPos) continue;
 			Map.SetCell(node, 0, new Vector2I(0, 1));
 		}
-		Path.AddPoint(_startPos * 32 + new Vector2I(16, 16));
+		// Path.AddPoint(_startPos * 32 + new Vector2I(16, 16));
 	}
 }

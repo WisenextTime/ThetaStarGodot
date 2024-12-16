@@ -6,7 +6,7 @@ using Godot;
 namespace ThetaStar.Scripts;
 
 // ReSharper disable NotAccessedPositionalProperty.Global
-public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, ThetaStarNodeState State, int Cost)
+public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, ThetaStarNodeState State)
 {
     // ReSharper restore NotAccessedPositionalProperty.Global
     public ThetaStarNodeState State { get; set; } = State;
@@ -14,7 +14,7 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
     public float HValue = Position.DistanceTo(End);
     public float GValue = Position.DistanceTo(Start);
 
-    public int Cost = Cost;
+    //public int Cost = Cost;
 
     public float UpperBound = float.PositiveInfinity;
     public float LowerBound = float.NegativeInfinity;
@@ -22,6 +22,12 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
     public ThetaStarNode Parent;
     public float FValue => GValue + HValue;
     public float DistanceTo(ThetaStarNode target) => Position.DistanceTo(target.Position);
+
+    public float AngleTo(Vector2 origin, Vector2 target) => (Position - origin).AngleTo(target - origin);
+
+    public float AngleTo(ThetaStarNode origin, ThetaStarNode target) => AngleTo(origin.Position, target.Position);
+
+    public float AngleTo(ThetaStarNode target) => AngleTo(Parent.Position, target.Position);
 
     public IEnumerable<Vector2I> GetNeighborsPos() =>
         from x in Enumerable.Range(-1, 3)
@@ -45,6 +51,7 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
 public enum ThetaStarNodeState
 {
     Open,
+    InSearch,
     Closed,
     Wall
 }
