@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Godot;
-using Godot.NativeInterop;
 
 namespace ThetaStar.Scripts;
 
@@ -61,7 +58,7 @@ public class ThetaStar
                 if (neighbor.State is not ThetaStarNodeState.Open) continue;
 
                 var inSearch = open.Contains(neighbor);
-                var cost = current.GValue + current.DistanceTo(neighbor);
+                var cost = current.GValue + current.DistanceTo(neighbor) * neighbor.Cost;
                 if (!inSearch || cost <= neighbor.GValue)
                 {
                     neighbor.GValue = cost;

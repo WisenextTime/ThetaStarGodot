@@ -10,15 +10,17 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
 {
     // ReSharper restore NotAccessedPositionalProperty.Global
     public ThetaStarNodeState State { get; set; } = State;
-
-    public float HValue = Position.DistanceTo(Start);
-    public float GValue = Position.DistanceTo(End);
-
+    
+    public float HValue = Position.DistanceTo(End);
+    public float GValue = Position.DistanceTo(Start);
+	
+    public int Cost = Cost;
+    
     public float UpperBound = float.PositiveInfinity;
     public float LowerBound = float.NegativeInfinity;
 
     public ThetaStarNode Parent;
-    public float FValue => GValue + HValue + Cost;
+    public float FValue => GValue + HValue;
     public float DistanceTo(ThetaStarNode target) => Position.DistanceTo(target.Position);
 
     public IEnumerable<Vector2I> GetNeighborsPos() =>
