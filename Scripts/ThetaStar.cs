@@ -58,7 +58,7 @@ public class ThetaStar
 			foreach (var neighbor in current.GetNeighbors(grid).Where(n => !closed.Contains(n)))
 			{
 				var inSearch = open.Contains(neighbor);
-				var cost = current.GValue + current.DistanceTo(neighbor);
+				var cost = current.GValue + current.DistanceTo(neighbor) * neighbor.Cost;
 				if (!inSearch || cost <= neighbor.GValue)
 				{
 					neighbor.GValue = cost;
@@ -80,15 +80,15 @@ public record Node(Vector2I Position, Vector2I Start, Vector2I End, Vector2I Siz
 {
 	public Vector2I Position = Position;
 	public Vector2I Size = Size;
-	public float HValue = Position.DistanceTo(Start);
-	public float GValue = Position.DistanceTo(End);
+	public float HValue = Position.DistanceTo(End);
+	public float GValue = Position.DistanceTo(Start);
 
 	public float UpperBound = float.PositiveInfinity;
 	public float LowerBound = float.NegativeInfinity;
 	
 	public int Cost = Cost;
 	public Node Parent;
-	public float FValue => GValue + HValue + Cost;
+	public float FValue => GValue + HValue;
 	public float DistanceTo(Node target) => Position.DistanceTo(target.Position);
 
 	private readonly bool _onLeft = Position.X == 0;
