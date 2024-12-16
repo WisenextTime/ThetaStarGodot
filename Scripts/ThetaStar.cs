@@ -5,11 +5,11 @@ using Godot;
 
 namespace ThetaStar.Scripts;
 
-public class ThetaStar
+public static class ThetaStar
 {
     public static List<Vector2I> FindPath(Vector2I from, Vector2I to, int[,] map)
     {
-        List<ThetaStarNode> open = []; //所有将要搜寻的点
+        List<ThetaStarNode> open = [];                        //所有将要搜寻的点
         var grid = new Dictionary<Vector2I, ThetaStarNode>(); //所有节点
 
         //给grid表中预先添加所有坐标对应的节点, 同时添加墙体
@@ -39,17 +39,7 @@ public class ThetaStar
             open.Remove(current);
 
             //寻路成功, 返回结果
-            if (current == endNode)
-            {
-                var currentNode = endNode;
-                var path = new List<Vector2I>();
-                while (currentNode != startNode)
-                {
-                    path.Add(currentNode.Position);
-                    currentNode = currentNode.Parent;
-                }
-                return path;
-            }
+            if (current == endNode) return current.GetPath();
 
             //寻路核心, 找到下一个节点
             foreach (var pos in current.GetNeighborsPos())

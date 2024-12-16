@@ -10,12 +10,12 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
 {
     // ReSharper restore NotAccessedPositionalProperty.Global
     public ThetaStarNodeState State { get; set; } = State;
-    
+
     public float HValue = Position.DistanceTo(End);
     public float GValue = Position.DistanceTo(Start);
-	
+
     public int Cost = Cost;
-    
+
     public float UpperBound = float.PositiveInfinity;
     public float LowerBound = float.NegativeInfinity;
 
@@ -28,6 +28,18 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
         from y in Enumerable.Range(-1, 3)
         where (x, y) != (0, 0)
         select new Vector2I(Position.X + x, Position.Y + y);
+
+    public List<Vector2I> GetPath()
+    {
+        Stack<ThetaStarNode> path = new();
+        var node = this;
+        while (node != null)
+        {
+            path.Push(node);
+            node = node.Parent;
+        }
+        return path.Select(x => x.Position).ToList();
+    }
 }
 
 public enum ThetaStarNodeState
