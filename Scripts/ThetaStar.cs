@@ -10,10 +10,12 @@ public class ThetaStar
 {
 	public static List<Vector2I> FindPath(Vector2I from, Vector2I to, int[,] map)
 	{
-		List<Node> open = [];
-		List<Node> closed = [];
-		List<Node> Walls = [];
-		var grid = new Dictionary<Vector2I, Node>();
+		List<Node> open = [];//所有将要搜寻的点
+		List<Node> closed = [];//所有搜寻过的点
+		List<Node> Walls = [];//所有墙体
+		var grid = new Dictionary<Vector2I, Node>();//所有节点
+		
+		//给grid表中预先添加所有坐标对应的节点, 同时添加墙体
 		for (var x = 0; x < map.GetLength(0); x++)
 		{
 			for (var y = 0; y < map.GetLength(1); y++)
@@ -30,6 +32,7 @@ public class ThetaStar
 		open.Add(startNode);
 		while (open.Any())
 		{
+			//找到可能最优的起始节点(遍历效率低下可改用二叉树之类的)
 			var current = open[0];
 			foreach (var node in open.Where(node =>
 				         node.FValue < current.FValue ||
@@ -38,6 +41,7 @@ public class ThetaStar
 			closed.Add(current);
 			open.Remove(current);
 
+			//寻路成功, 返回结果
 			if (current == endNode)
 			{
 				var currentNode = endNode;
@@ -50,6 +54,7 @@ public class ThetaStar
 				return path;
 			}
 			
+			//寻路核心, 找到下一个节点
 			foreach (var neighbor in current.GetNeighbors(grid).Where(n => !closed.Contains(n)))
 			{
 				var inSearch = open.Contains(neighbor);
