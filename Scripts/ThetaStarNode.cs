@@ -12,7 +12,8 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
     public ThetaStarNodeState State { get; set; } = State;
 
     public float HValue = Position.DistanceTo(End);
-    public float GValue = Position.DistanceTo(Start);
+    // public float GValue = Position.DistanceTo(Start);
+    public float GValue = float.PositiveInfinity;
 
     //public int Cost = Cost;
 
@@ -34,6 +35,9 @@ public record ThetaStarNode(Vector2I Position, Vector2I Start, Vector2I End, The
         from y in Enumerable.Range(-1, 3)
         where (x, y) != (0, 0)
         select new Vector2I(Position.X + x, Position.Y + y);
+
+    public IEnumerable<Vector2I> GetNearPos() =>
+        [Vector2I.Up + Position, Vector2I.Down + Position, Vector2I.Left + Position, Vector2I.Right + Position];
 
     public List<Vector2I> GetPath()
     {

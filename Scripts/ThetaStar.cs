@@ -35,6 +35,7 @@ public static class ThetaStar
         _startNode = _grid[from];
         _endNode = _grid[to];
         _open.Add(_startNode); //反正startNode马上就被标记为Closed了，想来没必要标记InSearch
+        _startNode.GValue = 0;
         while (_open.Any())
         {
             //找到可能最优的起始节点(遍历效率低下可改用二叉树之类的)
@@ -56,7 +57,8 @@ public static class ThetaStar
                 if (!_grid.TryGetValue(pos, out var neighbor)) continue;
                 if (neighbor.State is not ThetaStarNodeState.Open) continue;
 
-                UpdatePath(neighbor, current);
+                if (neighbor.State != ThetaStarNodeState.InSearch) neighbor.GValue = float.PositiveInfinity;
+                UpdateNode(neighbor, current);
             }
         }
 
@@ -80,9 +82,22 @@ public static class ThetaStar
                 current.UpperBound = 0;
         }
 
-        foreach (var pos in current.GetNeighborsPos())
+        // foreach (var wall in GetNearWalls(current))
+        // {
+        //     if (current.AngleTo(wall) < 0 ||
+        //         (current.AngleTo(wall).Equals(0) && current.Parent.DistanceTo(wall) <= current.Parent.DistanceTo(current)))
+        //         current.LowerBound = 0;
+        //
+        //     if (current.AngleTo(wall) > 0 ||
+        //         (current.AngleTo(wall).Equals(0) && current.Parent.DistanceTo(wall) <= current.Parent.DistanceTo(current)))
+        //         current.UpperBound = 0;
+        // }
+
+        // foreach (var pos in current.GetNeighborsPos())
+        foreach (var pos in current.GetNearPos())    //todo: 干脆注释了这段看看会怎么样
         {
             if (!_grid.TryGetValue(pos, out var n)) continue;
+            if (n.State is ThetaStarNodeState.Wall) continue;
 
             if (n.State is ThetaStarNodeState.Closed && n.Parent == current.Parent && n != _startNode)
             {
@@ -102,17 +117,17 @@ public static class ThetaStar
         }
     }
 
-    private static void UpdatePath(ThetaStarNode neighbor, ThetaStarNode current)
+    private static void UpdateNode(ThetaStarNode neighbor, ThetaStarNode current)
     {
         var inSearch = neighbor.State is ThetaStarNodeState.InSearch;
-        
+
         //AP-θ*: 判断路径
-        if (current.Parent is not null && current.AngleTo(neighbor).IsBetween(current.LowerBound, current.UpperBound))
+        if (current != _startNode && current.AngleTo(neighbor).IsBetween(current.LowerBound, current.UpperBound))
         {
             //path 2
             var cost = current.Parent.GValue + current.Parent.DistanceTo(neighbor);
-            if (inSearch && !(cost <= neighbor.GValue)) return; //已在搜寻中，无需更新
-            
+            if (inSearch && cost > neighbor.GValue) return; //已在搜寻中，无需更新
+
             neighbor.GValue = cost;
             neighbor.Parent = current.Parent;
         }
@@ -120,8 +135,8 @@ public static class ThetaStar
         {
             //path 1
             var cost = current.GValue + current.DistanceTo(neighbor);
-            if (inSearch && !(cost <= neighbor.GValue)) return; //已在搜寻中，无需更新
-            
+            if (inSearch && cost > neighbor.GValue) return; //已在搜寻中，无需更新
+
             neighbor.GValue = cost;
             neighbor.Parent = current;
         }
@@ -153,4 +168,8 @@ public static class ThetaStar
                 yield return corner; //.Where(n => n.State is not ThetaStarNodeState.Wall).ToArray();
         }
     }
+
+    // private static IEnumerable<ThetaStarNode> GetNearWalls(ThetaStarNode node) =>
+    //     node.GetNeighborsPos().Select(p => _grid.GetValueOrDefault(p))
+    //         .Where(n => n is { State: ThetaStarNodeState.Wall });
 }
